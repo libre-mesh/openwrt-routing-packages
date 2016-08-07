@@ -1,6 +1,9 @@
 #!/usr/bin/lua
 
 local type_id = 64 -- bat-hosts
+local blacklist_mac = {}
+blacklist_mac["00:00:00:00:00:00"] = true
+blacklist_mac["aa:aa:aa:aa:aa:aa"] = true
 
 function get_hostname()
   local hostfile = io.open("/proc/sys/kernel/hostname", "r")
@@ -41,7 +44,7 @@ local function generate_bat_hosts()
   end
 
   for mac, iname in pairs(ifaces) do
-    if mac:match("^%x%x:%x%x:%x%x:%x%x:%x%x:%x%x$") and not mac:match("00:00:00:00:00:00") then
+    if mac:match("^%x%x:%x%x:%x%x:%x%x:%x%x:%x%x$") and not blacklist_mac[mac:lower()] then
       table.insert(ret, mac.." "..hostname.."_"..iname.."\n")
     end
   end
